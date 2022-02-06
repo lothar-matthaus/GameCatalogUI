@@ -1,23 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import HomeList from "./components/HomeList";
+import Navbar from "./components/Navbar";
+import IGame from "./interfaces/IGame";
 
 function App() {
+  const [gameList, setGameList] = useState<IGame[]>([]);
+  var route: string = 'Game';
+
+  var button = document.getElementById('buttonSearch');
+  var textField = document.querySelector('#searchField');
+
+
+  if (button != null) {
+    button.onclick = (event) => {
+      var keyword: string = localStorage.getItem('keyword');
+
+      const request = axios.create({ baseURL: 'https://localhost:5001/api' });
+
+      if (keyword.length > 0) {
+        request.get<IGame[]>(route + '/Search/' + keyword).then((response) => {
+          if (response.status >= 200 && response.status <= 300)
+            setGameList(response.data);
+        });
+      } else {
+        request.get<IGame[]>(route).then((response) => {
+          if (response.status >= 200 && response.status <= 300)
+            setGameList(response.data);
+        });
+      }
+
+    }
+  }
+
+  useEffect(() => {
+    const request = axios.create({ baseURL: 'https://localhost:5001/api' });
+
+    request.get<IGame[]>(route).then((response) => {
+      setGameList(response.data);
+    });
+  }, []);
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <Navbar />
+        <HomeList gameList={gameList} />
       </header>
     </div>
   );
