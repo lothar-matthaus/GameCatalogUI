@@ -9,8 +9,6 @@ function App() {
   var route: string = 'Game';
 
   var button = document.getElementById('buttonSearch');
-  var textField = document.querySelector('#searchField');
-
 
   if (button != null) {
     button.onclick = (event) => {
@@ -35,7 +33,7 @@ function App() {
 
   useEffect(() => {
     const request = axios.create({ baseURL: 'https://localhost:5001/api' });
-
+    localStorage.clear();
     request.get<IGame[]>(route).then((response) => {
       setGameList(response.data);
     });
